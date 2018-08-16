@@ -36,7 +36,8 @@ def logout():
 @app.route('/get_data')
 def get_data():
     if is_login():
-        return render_template('data_view.html')
+        res = Data.get_env_data()
+        return render_template('data_view.html', res=res)
     else:
         return redirect(url_for('login'))
 

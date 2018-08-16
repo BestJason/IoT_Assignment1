@@ -1,6 +1,7 @@
 import sqlite3
 from flask import g
 from passlib.hash import sha256_crypt
+from sense_hat import SenseHat
 
 DATABASE = './db/database.db'
 
@@ -34,8 +35,25 @@ class Data():
             cur.execute("DROP TABLE IF EXISTS {}". format(DATA_TABLE_NAME))
             cur.execute("CREATE TABLE {} (humidity DOUBLE(30, 8) NOT NULL, temperature DOUBLE(30, 8) NOT NULL, pressure DOUBLE(30, 8) NOT NULL, created_at DATETIME)". format(DATA_TABLE_NAME))
             return True
-        except:
+        except ValueError:
             return False
+
+    def insert_env_data():
+        try:
+            cur = get_db().cursor()
+            humidity = SenseHat().get_humidity()
+            temperature = SenseHat().get_temperature()
+            pressure = SenseHat().get_pressure()
+            cur.execute("INSERT INTO {} VALUES(?, ?, ?, datetime())". format(DATA_TABLE_NAME), (humidity, temperature, pressure))
+            get_db().commit()
+            return True
+        except ValueError:
+            return False
+    
+    def get_env_data():
+        sql = "SELECT rowid, humidity, temperature, pressure, created_at FROM {}". format(DATA_TABLE_NAME)
+        res = query_db(sql)
+        return res
 
 class Admin():
     def init_admin_data():
