@@ -50,9 +50,24 @@ class Data():
             return True
         except ValueError:
             return False
-    
+
     def get_env_data():
         sql = "SELECT rowid, humidity, temperature, pressure, created_at FROM {}". format(DATA_TABLE_NAME)
+        res = query_db(sql)
+        return res
+
+    def get_humidity():
+        sql = "SELECT humidity, created_at FROM {}". format(DATA_TABLE_NAME)
+        res = query_db(sql)
+        return res
+
+    def get_temperature():
+        sql = "SELECT temperature, created_at FROM {}". format(DATA_TABLE_NAME)
+        res = query_db(sql)
+        return res
+
+    def get_pressure():
+        sql = "SELECT pressure, created_at FROM {}". format(DATA_TABLE_NAME)
         res = query_db(sql)
         return res
 

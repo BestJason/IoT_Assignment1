@@ -1,9 +1,10 @@
-from flask import Flask, render_template, session, redirect, url_for, request
+from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from forms import LoginForm, CreateJobForm
 from models import Admin, Data, Job
 import os
 from passlib.hash import sha256_crypt
 import click
+import json
 
 app = Flask(__name__)
 app.secret_key = os.urandom(32)
@@ -39,6 +40,30 @@ def get_data():
     if is_login():
         res = Data.get_env_data()
         return render_template('data_view.html', res=res)
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/get_humidity')
+def get_humidity():
+    if is_login():
+        res = json.dumps(Data.get_humidity())
+        return render_template('chart_view.html', res=res, title="Humidity", unit=" rH")
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/get_temperature')
+def get_temperature():
+    if is_login():
+        res = json.dumps(Data.get_temperature())
+        return render_template('chart_view.html', res=res, title="Temperature", unit=" C")
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/get_pressure')
+def get_pressure():
+    if is_login():
+        res = json.dumps(Data.get_pressure())
+        return render_template('chart_view.html', res=res, title="Pressure", unit="Millibars")
     else:
         return redirect(url_for('login'))
 
