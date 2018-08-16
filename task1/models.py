@@ -8,6 +8,8 @@ ADMIN_TABLE_NAME = 'iot_admin'
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'IoTadmin123'
 
+DATA_TABLE_NAME = 'iot_data'
+
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -24,6 +26,16 @@ def query_db(query, args=(), one=False):
     res = cur.fetchall()
     cur.close()
     return (res[0] if res else None) if one else res
+
+class Data():
+    def init_data_table():
+        try:
+            cur = get_db().cursor()
+            cur.execute("DROP TABLE IF EXISTS {}". format(DATA_TABLE_NAME))
+            cur.execute("CREATE TABLE {} (humidity DOUBLE(30, 8) NOT NULL, temperature DOUBLE(30, 8) NOT NULL, pressure DOUBLE(30, 8) NOT NULL, created_at DATETIME)". format(DATA_TABLE_NAME))
+            return True
+        except:
+            return False
 
 class Admin():
     def init_admin_data():
