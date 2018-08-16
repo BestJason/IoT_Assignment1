@@ -2,6 +2,7 @@ import sqlite3
 from flask import g
 from passlib.hash import sha256_crypt
 from sense_hat import SenseHat
+from crontab import CronTab
 
 DATABASE = './db/database.db'
 
@@ -44,7 +45,7 @@ class Data():
             humidity = SenseHat().get_humidity()
             temperature = SenseHat().get_temperature()
             pressure = SenseHat().get_pressure()
-            cur.execute("INSERT INTO {} VALUES(?, ?, ?, datetime())". format(DATA_TABLE_NAME), (humidity, temperature, pressure))
+            cur.execute("INSERT INTO {} VALUES(?, ?, ?, datetime(CURRENT_TIMESTAMP,'localtime'))". format(DATA_TABLE_NAME), (humidity, temperature, pressure))
             get_db().commit()
             return True
         except ValueError:
@@ -54,6 +55,18 @@ class Data():
         sql = "SELECT rowid, humidity, temperature, pressure, created_at FROM {}". format(DATA_TABLE_NAME)
         res = query_db(sql)
         return res
+
+class Job():
+    def write_job(command, expression='* * * * *', comment=''):
+        cron = CronTab(user='pi')
+        job  = cron.new(command=command, comment=comment)
+        job.setall(expression)
+        cron.write()
+
+    def get_jobs():
+        cron = CronTab(user='pi')
+        return cron
+
 
 class Admin():
     def init_admin_data():

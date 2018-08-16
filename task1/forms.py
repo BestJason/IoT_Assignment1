@@ -17,3 +17,18 @@ class LoginForm(Form):
         password = form.password.data
         if Admin.is_admin(username, password) is False:
             raise ValidationError('Username Or Password Is Invalid')
+
+class CreateJobForm(Form):
+    frequency = StringField('frequency', validators=[
+        validators.DataRequired()
+    ])
+
+    command = StringField('command', validators=[
+        validators.DataRequired()
+    ])
+
+    comment = StringField('comment', validators=[
+        validators.DataRequired()
+    ])
+
+
