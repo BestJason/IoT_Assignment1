@@ -145,5 +145,9 @@ def init_alarm_table():
 def get_insert_env_data():
     return Data.insert_env_data()
 
+@app.cli.command()
+def enable_alarm():
+    return Alarm.enable_alarm()
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8080)

@@ -3,6 +3,9 @@ from flask import g
 from passlib.hash import sha256_crypt
 from sense_hat import SenseHat
 from crontab import CronTab
+import requests
+import time
+import json
 
 DATABASE = '../db/database.db'
 
@@ -13,6 +16,9 @@ ADMIN_PASSWORD = 'IoTadmin123'
 DATA_TABLE_NAME = 'iot_data'
 
 ALARM_TABLE_NAME = 'iot_alarm'
+
+ACCESS_TOKEN = 'o.HA05DAZtj2DqlDvHpCLu3CPDCWqKsbF5'
+API_ADDRESS = 'https://api.pushbullet.com/v2/pushes'
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -64,6 +70,55 @@ class Alarm():
             return True
         except:
             return False
+
+    def is_alarm(row, value):
+        if row[2] == '<':
+            return row[3] > value
+        elif row[2] == '=':
+            return row[3] == value
+        elif row[2] == '>':
+            return row[3] < value
+        else:
+            return False
+
+    def enable_alarm():
+        try:
+            while True:
+                print("Start to listen.....")
+                alarms = Alarm.get_alarms()
+                print("Got Alarms: {}". format(alarms))
+                for row in alarms:
+                    if row[1] == 'humidity':
+                        value = SenseHat().get_humidity()
+                    elif row[1] == 'temperature':
+                        value = SenseHat().get_temperature()
+                    elif row[1] == 'pressure':
+                        value = SenseHat().get_pressure()
+                    if Alarm.is_alarm(row, value):
+                        print("Alarm Condition is met!!!")
+                        Alarm.send_alarm('Alarm Message!!!', '{} met the demand of alarming: {} {} {} -- current {} : {}'. format(row[1], row[1], row[2], row[3], row[1], value))
+                        print("{} Alarmed!!!". format(row[1]))
+                time.sleep(30)
+                print("Continue to listen....")
+        except Exception as e:
+            print(e)
+            return False
+
+    def send_alarm(title, body):
+        request = {
+            "type": "note",
+            "title": title,
+            "body": body
+        }
+        headers = {
+            'Authorization': 'Bearer ' + ACCESS_TOKEN,
+            'Content-Type': 'application/json'
+        }
+        res = requests.post(API_ADDRESS, data = json.dumps(request), headers = headers)
+        if res.status_code != 200:
+            raise Exception(res.raise_for_status())
+        else:
+            print('complete sending')
 
 class Data():
     def init_data_table():
