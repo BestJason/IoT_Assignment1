@@ -41,6 +41,16 @@ class Alarm():
         except ValueError:
             return False
 
+    def insert_alarm_threshold(threshold_key, threshold_opt, threshold_val):
+        try:
+            cur = get_db().cursor()
+            cur.execute("INSERT INTO {} VALUES(?, ?, ?, datetime(CURRENT_TIMESTAMP,'localtime'))". format(ALARM_TABLE_NAME), (threshold_key, threshold_opt, threshold_val))
+            get_db().commit()
+            return True
+        except ValueError:
+            return False
+
+
 
 class Data():
     def init_data_table():

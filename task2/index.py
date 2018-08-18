@@ -96,13 +96,18 @@ def delete_job(comment):
     else:
         return redirect(url_for('login'))
 
-@app.route('/set_alarm_threshold')
+@app.route('/set_alarm_threshold', methods=['GET', 'POST'])
 def set_alarm_threshold():
     if is_login():
         form = SetAlarmForm(request.form)
+        if request.method == 'POST' and form.validate():
+            if Alarm.insert_alarm_threshold(form.threshold_key.data, form.threshold_opt.data, form.threshold_val.data):
+                return redirect(url_for('get_alarms'))
         return render_template('set_alarm_threshold.html', form=form)
     else:
         return redirect(url_for('login'))
+
+
 
 @app.route('/init_admin_data')
 def init_admin_data():
