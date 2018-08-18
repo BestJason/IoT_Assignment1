@@ -107,7 +107,14 @@ def set_alarm_threshold():
     else:
         return redirect(url_for('login'))
 
-
+@app.route('/get_alarms')
+def get_alarms():
+    if is_login():
+        alarms = Alarm.get_alarms()
+        print(alarms)
+        return render_template('alarms_view.html', res=alarms)
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/init_admin_data')
 def init_admin_data():

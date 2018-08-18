@@ -50,7 +50,10 @@ class Alarm():
         except ValueError:
             return False
 
-
+    def get_alarms():
+        sql = "SELECT rowid, threshold_key, threshold_opt, threshold_val, created_at FROM {}". format(ALARM_TABLE_NAME)
+        res = query_db(sql)
+        return res
 
 class Data():
     def init_data_table():
