@@ -12,6 +12,8 @@ ADMIN_PASSWORD = 'IoTadmin123'
 
 DATA_TABLE_NAME = 'iot_data'
 
+ALARM_TABLE_NAME = 'iot_alarm'
+
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -28,6 +30,17 @@ def query_db(query, args=(), one=False):
     res = cur.fetchall()
     cur.close()
     return (res[0] if res else None) if one else res
+
+class Alarm():
+    def init_alarm_table():
+        try:
+            cur = get_db().cursor()
+            cur.execute("DROP TABLE IF EXISTS {}". format(ALARM_TABLE_NAME))
+            cur.execute("CREATE TABLE {} (threshold_key VARCHAR(255) NOT NULL, threshold_value DOUBLE(30, 8) NOT NULL, created_at DATETIME)". format(ALARM_TABLE_NAME))
+            return True
+        except ValueError:
+            return False
+
 
 class Data():
     def init_data_table():

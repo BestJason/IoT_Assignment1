@@ -1,6 +1,6 @@
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from forms import LoginForm, CreateJobForm
-from models import Admin, Data, Job
+from models import Admin, Data, Job, Alarm
 import os
 from passlib.hash import sha256_crypt
 import click
@@ -105,6 +105,12 @@ def init_admin_data():
 @app.route('/init_data_table')
 def init_data_table():
     if Data.init_data_table():
+        return "Successfully Initialized!"
+    return "Failed"
+
+@app.route('/init_alarm_table')
+def init_alarm_table():
+    if Alarm.init_alarm_table():
         return "Successfully Initialized!"
     return "Failed"
 
