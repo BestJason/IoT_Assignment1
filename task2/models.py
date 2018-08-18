@@ -55,6 +55,16 @@ class Alarm():
         res = query_db(sql)
         return res
 
+    def delete_alarm(id):
+        try:
+            cur = get_db().cursor()
+            sql = "DELETE FROM {} WHERE rowid = ?". format(ALARM_TABLE_NAME)
+            cur.execute(sql, [id])
+            get_db().commit()
+            return True
+        except:
+            return False
+
 class Data():
     def init_data_table():
         try:

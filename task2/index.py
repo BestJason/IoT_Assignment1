@@ -111,8 +111,15 @@ def set_alarm_threshold():
 def get_alarms():
     if is_login():
         alarms = Alarm.get_alarms()
-        print(alarms)
         return render_template('alarms_view.html', res=alarms)
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/delete_alarm/id/<int:id>')
+def delete_alarm(id):
+    if is_login():
+        Alarm.delete_alarm(id)
+        return redirect(url_for('get_alarms'))
     else:
         return redirect(url_for('login'))
 
