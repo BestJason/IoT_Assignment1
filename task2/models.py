@@ -4,7 +4,7 @@ from passlib.hash import sha256_crypt
 from sense_hat import SenseHat
 from crontab import CronTab
 
-DATABASE = './db/database.db'
+DATABASE = '../db/database.db'
 
 ADMIN_TABLE_NAME = 'iot_admin'
 ADMIN_USERNAME = 'admin'
