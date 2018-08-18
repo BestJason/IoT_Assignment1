@@ -36,7 +36,7 @@ class Alarm():
         try:
             cur = get_db().cursor()
             cur.execute("DROP TABLE IF EXISTS {}". format(ALARM_TABLE_NAME))
-            cur.execute("CREATE TABLE {} (threshold_key VARCHAR(255) NOT NULL, threshold_value DOUBLE(30, 8) NOT NULL, created_at DATETIME)". format(ALARM_TABLE_NAME))
+            cur.execute("CREATE TABLE {} (threshold_key VARCHAR(255) NOT NULL, threshold_opt VARCHAR(32) NOT NULL, threshold_val DOUBLE(30, 8) NOT NULL, created_at DATETIME)". format(ALARM_TABLE_NAME))
             return True
         except ValueError:
             return False
