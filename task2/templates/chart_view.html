@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+{% include 'includes/_nav.html' %}
+
+<div class="container" style="margin-top: 30px">	
+<div id="chartContainer"></div>
+<script>
+  window.onload = function() {
+
+  var dataPoints = [];
+
+  var options =  {
+    animationEnabled: true,
+    zoomEnabled: true,
+    theme: "light2",
+    title: {
+      text: "{{ title }}"
+    },
+    axisX: {
+      interval: 30,
+      valueFormatString: "HH:mm:ss DD-MMM-YYYY",
+      intervalType: "minute",
+			crosshair: {
+				enabled: true,
+				snapToDataPoint: true
+			}
+    },
+    axisY: {
+      title: " {{ unit }} ",
+      titleFontSize: 24,
+      includeZero: true,
+			crosshair: {
+				enabled: true,
+				snapToDataPoint: true
+			}
+
+    },
+    data: [{
+      color: "rgba(54,158,173,.7)",
+      type: "area", 
+      yValueFormatString: "#######.######## {{ unit }}",
+      xValueFormatString: "HH:mm:ss",
+      dataPoints: dataPoints
+    }]
+  };
+
+  function addData(data) {
+    data = JSON.parse(data)
+    for (var i = 0; i < data.length; i++) {
+      dataPoints.push({
+        x: new Date(data[i][1]),
+        y: data[i][0]
+      });
+    }
+    $("#chartContainer").CanvasJSChart(options);
+  }
+  addData({{ res | tojson }})
+}
+</script>
+</div>
+{% endblock %}
