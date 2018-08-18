@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, PasswordField, validators
+from wtforms import Form, StringField, PasswordField, validators, SelectField
 from wtforms.validators import ValidationError
 from models import Admin
 
@@ -31,4 +31,24 @@ class CreateJobForm(Form):
         validators.DataRequired()
     ])
 
+class SetAlarmForm(Form):
+    threshold_key = SelectField('Your threshold type', validators=[
+        validators.DataRequired()
+    ], choices=[
+        ('humidity', 'Humidity'),
+        ('temperature', 'Temperature'),
+        ('pressure', 'Pressure')
+    ])
+
+    threshold_opt = SelectField('Your operation type', validators=[
+        validators.DataRequired()
+    ], choices=[
+        ('<', 'Less than'),
+        ('=', 'Equal to'),
+        ('>', 'More than')
+    ])
+
+    threshold_val = StringField('Your threshold value', validators=[
+        validators.DataRequired()
+    ])
 

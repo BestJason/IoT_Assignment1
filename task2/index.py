@@ -1,5 +1,5 @@
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
-from forms import LoginForm, CreateJobForm
+from forms import LoginForm, CreateJobForm, SetAlarmForm
 from models import Admin, Data, Job, Alarm
 import os
 from passlib.hash import sha256_crypt
@@ -93,6 +93,14 @@ def delete_job(comment):
         jobs.remove_all(comment=comment)
         jobs.write()
         return redirect(url_for('get_jobs'))
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/set_alarm_threshold')
+def set_alarm_threshold():
+    if is_login():
+        form = SetAlarmForm(request.form)
+        return render_template('set_alarm_threshold.html', form=form)
     else:
         return redirect(url_for('login'))
 
