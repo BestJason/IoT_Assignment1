@@ -1,8 +1,9 @@
+# import necessary packages
 from wtforms import Form, StringField, PasswordField, validators, SelectField
 from wtforms.validators import ValidationError
 from models import Admin
 
-# define the login form
+# define the login form model
 class LoginForm(Form):
     username = StringField('username', validators=[
         validators.DataRequired()
@@ -18,6 +19,7 @@ class LoginForm(Form):
         if Admin.is_admin(username, password) is False:
             raise ValidationError('Username Or Password Is Invalid')
 
+# define create job form model
 class CreateJobForm(Form):
     frequency = StringField('frequency', validators=[
         validators.DataRequired()
@@ -31,6 +33,7 @@ class CreateJobForm(Form):
         validators.DataRequired()
     ])
 
+# define set alarm form model
 class SetAlarmForm(Form):
     threshold_key = SelectField('Your threshold type', validators=[
         validators.DataRequired()

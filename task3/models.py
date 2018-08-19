@@ -1,3 +1,4 @@
+# import necessary packages
 import sqlite3
 from flask import g
 from passlib.hash import sha256_crypt
@@ -8,41 +9,56 @@ import time
 import json
 import bluetooth
 
+# define database address
 DATABASE = '../db/database.db'
 
+# define admin table name
 ADMIN_TABLE_NAME = 'iot_admin'
+
+# define admin username
 ADMIN_USERNAME = 'admin'
+
+# define admin password
 ADMIN_PASSWORD = 'IoTadmin123'
 
+# define data table name
 DATA_TABLE_NAME = 'iot_data'
 
+# define alarm table name
 ALARM_TABLE_NAME = 'iot_alarm'
 
+# define PushBullet API Access_token and API Address
 ACCESS_TOKEN = 'o.HA05DAZtj2DqlDvHpCLu3CPDCWqKsbF5'
 API_ADDRESS = 'https://api.pushbullet.com/v2/pushes'
 
+# command function for connecting sqlite
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
     return db
 
+# common function for closing sqlite
 def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
 
+# common function for running query
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
     res = cur.fetchall()
     cur.close()
     return (res[0] if res else None) if one else res
 
+# Bluetooth Model
 class BlueTooth():
+    # get bluetooth devices
     def get_bluetooth():
         devices = bluetooth.discover_devices(lookup_names = True)
         return devices
 
+    # greet by bluetooth
     def greet(name, addr):
         device_name = bluetooth.lookup_name(addr, timeout = 5)
         if device_name == name:
@@ -55,7 +71,9 @@ class BlueTooth():
         else:
             return False
 
+# Alarm Model
 class Alarm():
+    # init table
     def init_alarm_table():
         try:
             cur = get_db().cursor()
@@ -65,6 +83,7 @@ class Alarm():
         except ValueError:
             return False
 
+    # insert alarm
     def insert_alarm_threshold(threshold_key, threshold_opt, threshold_val):
         try:
             cur = get_db().cursor()
@@ -74,11 +93,13 @@ class Alarm():
         except ValueError:
             return False
 
+    # get alatm list
     def get_alarms():
         sql = "SELECT rowid, threshold_key, threshold_opt, threshold_val, created_at FROM {}". format(ALARM_TABLE_NAME)
         res = query_db(sql)
         return res
 
+    # delete alarm data
     def delete_alarm(id):
         try:
             cur = get_db().cursor()
@@ -89,6 +110,7 @@ class Alarm():
         except:
             return False
 
+    # check if alarms are triggered
     def is_alarm(row, value):
         if row[2] == '<':
             return row[3] > value
@@ -99,6 +121,7 @@ class Alarm():
         else:
             return False
 
+    # enable alarm listen
     def enable_alarm():
         try:
             while True:
@@ -122,6 +145,7 @@ class Alarm():
             print(e)
             return False
 
+    # send alarm to device
     def send_alarm(title, body):
         request = {
             "type": "note",
@@ -138,7 +162,9 @@ class Alarm():
         else:
             print('complete sending')
 
+# Environment Data Model
 class Data():
+    # init table
     def init_data_table():
         try:
             cur = get_db().cursor()
@@ -148,6 +174,7 @@ class Data():
         except ValueError:
             return False
 
+    # insert environment data
     def insert_env_data():
         try:
             cur = get_db().cursor()
@@ -160,39 +187,47 @@ class Data():
         except ValueError:
             return False
 
+    # get environment data list
     def get_env_data():
         sql = "SELECT rowid, humidity, temperature, pressure, created_at FROM {}". format(DATA_TABLE_NAME)
         res = query_db(sql)
         return res
 
+    # get humidity
     def get_humidity():
         sql = "SELECT humidity, created_at FROM {}". format(DATA_TABLE_NAME)
         res = query_db(sql)
         return res
 
+    # get temperature data
     def get_temperature():
         sql = "SELECT temperature, created_at FROM {}". format(DATA_TABLE_NAME)
         res = query_db(sql)
         return res
 
+    # get pressure data
     def get_pressure():
         sql = "SELECT pressure, created_at FROM {}". format(DATA_TABLE_NAME)
         res = query_db(sql)
         return res
 
+# Job Model
 class Job():
+    # write a job into cron
     def write_job(command, expression='* * * * *', comment=''):
         cron = CronTab(user='pi')
         job  = cron.new(command=command, comment=comment)
         job.setall(expression)
         cron.write()
 
+    # get cron job list
     def get_jobs():
         cron = CronTab(user='pi')
         return cron
 
-
+# Admin Model
 class Admin():
+    # init table
     def init_admin_data():
         try:
             cur = get_db().cursor()
@@ -204,7 +239,8 @@ class Admin():
             return True
         except ValueError as e:
             return False
-    
+
+    # check if user is admin
     def is_admin(username, password):
         try:
             cur = get_db().cursor()
