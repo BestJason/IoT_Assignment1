@@ -1,10 +1,11 @@
 from flask import Flask, render_template, session, redirect, url_for, request, jsonify
 from forms import LoginForm, CreateJobForm, SetAlarmForm
-from models import Admin, Data, Job, Alarm
+from models import Admin, Data, Job, Alarm, BlueTooth
 import os
 from passlib.hash import sha256_crypt
 import click
 import json
+import time
 
 app = Flask(__name__)
 app.secret_key = os.urandom(32)
@@ -122,6 +123,32 @@ def delete_alarm(id):
         return redirect(url_for('get_alarms'))
     else:
         return redirect(url_for('login'))
+
+@app.route('/get_devices')
+def get_devices():
+    if is_login():
+        return render_template('bluetooth_view.html')
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/get_devices_json')
+def get_devices_json():
+    if is_login():
+        blues = BlueTooth.get_bluetooth()
+        return json.dumps(blues)
+    else:
+        return json.dumps({'code': -1, 'msg': 'fail'})
+
+@app.route('/bluetooth_greet', methods=['POST'])
+def greet():
+    if is_login():
+        name = request.form.get("name")
+        addr = request.form.get("addr")
+        if BlueTooth.greet(name, addr):
+          return json.dumps({'code': 1, 'msg': 'ok'})
+        return json.dumps({'code': -1, 'msg': 'fail'})
+    else:
+        return json.dumps({'code': -1, 'msg': 'fail'})
 
 @app.route('/init_admin_data')
 def init_admin_data():

@@ -6,6 +6,7 @@ from crontab import CronTab
 import requests
 import time
 import json
+import bluetooth
 
 DATABASE = '../db/database.db'
 
@@ -36,6 +37,23 @@ def query_db(query, args=(), one=False):
     res = cur.fetchall()
     cur.close()
     return (res[0] if res else None) if one else res
+
+class BlueTooth():
+    def get_bluetooth():
+        devices = bluetooth.discover_devices(lookup_names = True)
+        return devices
+
+    def greet(name, addr):
+        device_name = bluetooth.lookup_name(addr, timeout = 5)
+        if device_name == name:
+            print("Hi {}! Your device ({}) has the MAC address: {}". format(name, name, addr))
+            sense = SenseHat()
+            temp = sense.get_temperature()
+            temp = round(temp, 2)
+            sense.show_message("Hi {}! Current Temp is {}*c". format(name, temp), scroll_speed=0.05)
+            return True
+        else:
+            return False
 
 class Alarm():
     def init_alarm_table():
