@@ -178,9 +178,9 @@ class Data():
     def insert_env_data():
         try:
             cur = get_db().cursor()
-            humidity = SenseHat().get_humidity()
-            temperature = SenseHat().get_temperature()
-            pressure = SenseHat().get_pressure()
+            humidity = round(SenseHat().get_humidity(), 5)
+            temperature = round(SenseHat().get_temperature(), 5)
+            pressure = round(SenseHat().get_pressure(), 5)
             cur.execute("INSERT INTO {} VALUES(?, ?, ?, datetime(CURRENT_TIMESTAMP,'localtime'))". format(DATA_TABLE_NAME), (humidity, temperature, pressure))
             get_db().commit()
             return True
@@ -189,7 +189,7 @@ class Data():
 
     # get environment data list
     def get_env_data():
-        sql = "SELECT rowid, humidity, temperature, pressure, created_at FROM {}". format(DATA_TABLE_NAME)
+        sql = "SELECT rowid, humidity, temperature, pressure, created_at FROM {} ORDER BY created_at DESC LIMIT 50". format(DATA_TABLE_NAME)
         res = query_db(sql)
         return res
 
